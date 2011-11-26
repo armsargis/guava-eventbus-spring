@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="http://sargis.info/eventbus"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            targetNamespace="http://sargis.info/eventbus"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"
+                schemaLocation="http://www.springframework.org/schema/tool/spring-tool-3.0.xsd"/>
+
+    <xsd:import namespace="http://www.springframework.org/schema/tool" schemaLocation="http://www.springframework.org/schema/tool/spring-tool-3.0.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[
+    Defines the elements used in the gev project's declarative eventbus infrastructure.
+        ]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="handler-scan">
+
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	Scans the classpath for annotated components that will be auto-registered as
+	Spring beans. By default, the Spring-provided @Component, @Repository,
+	@Service, and @Controller stereotypes will be detected.
+			]]></xsd:documentation>
+        </xsd:annotation>
+
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="include" type="filterType" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+	Controls which eligible types to include for component scanning.
+							]]></xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="exclude" type="filterType" minOccurs="0" maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+	Controls which eligible types to exclude for component scanning.
+						]]></xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:sequence>
+
+            <xsd:attribute name="base-package" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+	The comma-separated list of packages to scan for annotated components.
+					]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="eventbus-ref" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+	EventBus bean reference
+					]]></xsd:documentation>
+                    <xsd:appinfo>
+                        <tool:annotation kind="ref">
+                            <tool:expected-type type="com.google.common.eventbus.EventBus"/>
+                        </tool:annotation>
+                    </xsd:appinfo>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+
+    </xsd:element>
+
+    <xsd:complexType name="filterType">
+        <xsd:attribute name="type" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    Controls the type of filtering to apply to the expression.
+
+    "annotation" indicates an annotation to be present at the type level in target components;
+    "assignable" indicates a class (or interface) that the target components are assignable to (extend/implement);
+    "regex" indicates a regex expression to be matched by the target components' class names;
+    "custom" indicates a custom implementation of the org.springframework.core.type.TypeFilter interface.
+
+    Note: This attribute will not be inherited by child bean definitions.
+    Hence, it needs to be specified per concrete bean definition.
+                ]]></xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="annotation"/>
+                    <xsd:enumeration value="assignable"/>
+                    <xsd:enumeration value="regex"/>
+                    <xsd:enumeration value="custom"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="expression" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    Indicates the filter expression, the type of which is indicated by "type".
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
+</xsd:schema>
