@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin:'idea'
+
+repositories { 
+    mavenCentral() 
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '10.0.1'
+}
+
