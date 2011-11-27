@@ -21,6 +21,7 @@ import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.xml.XmlReaderContext;
@@ -36,7 +37,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -80,12 +80,12 @@ public class EventBusHandlerBeanDefinitionParser extends AbstractSingleBeanDefin
         );
 
         ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
-        Set<RuntimeBeanReference> candidates = new HashSet<RuntimeBeanReference>(32);
+        Set<RuntimeBeanReference> candidates = new ManagedSet<RuntimeBeanReference>(32);
 
         for (String basePackage : basePackages) {
             Set<BeanDefinition> components = scanner.findCandidateComponents(basePackage);
             for (BeanDefinition component : components) {
-                candidates.add(createRuntimeBeanReference(parserContext, component));
+                candidates.add(defineRuntimeBeanReference(parserContext, component));
             }
         }
 
@@ -96,8 +96,11 @@ public class EventBusHandlerBeanDefinitionParser extends AbstractSingleBeanDefin
         return element.getAttribute(XSD_ATTR_EVENTBUS);
     }
 
-    private RuntimeBeanReference createRuntimeBeanReference(ParserContext parserContext, BeanDefinition beanDefinition) {
-        return new RuntimeBeanReference(getGeneratedBeanName(parserContext, beanDefinition));
+    private RuntimeBeanReference defineRuntimeBeanReference(ParserContext parserContext, BeanDefinition beanDefinition) {
+        String generatedBeanName = getGeneratedBeanName(parserContext, beanDefinition);
+
+        parserContext.getRegistry().registerBeanDefinition(generatedBeanName, beanDefinition);
+        return new RuntimeBeanReference(generatedBeanName);
     }
 
     private String getGeneratedBeanName(ParserContext parserContext, BeanDefinition component) {
