@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:eventbus="http://sargis.info/eventbus"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://sargis.info/eventbus http://sargis.info/eventbus/eventbus-spring-1.0.xsd">
+
+    <eventbus:handler-scan base-package="info.sargis.eventbus.config.handlers" eventbus-ref="eventBus">
+        <eventbus:include type="assignable" expression="info.sargis.eventbus.config.handlers.assignable.Processor"/>
+    </eventbus:handler-scan>
+
+    <bean id="eventBus" class="info.sargis.eventbus.config.MockitoFactory" factory-method="mockEventBus"/>
+
+</beans>
