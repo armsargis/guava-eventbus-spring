@@ -1,4 +1,4 @@
-This project provides Spring schema-based extensions for scanning and registering event handlers
+This project provides Spring schema-based extension for scanning and registering Guava EventBus event handlers
 
 # How to build
 
@@ -17,7 +17,7 @@ public interface EventHandler<T> {
 
 <strong>implementation:</strong>
 
-    public class AlertEventHandler<T> implements EventHandler<String> {
+    public class AlertEventHandler implements EventHandler<String> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(AlertEventHandler.class);
 
