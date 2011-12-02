@@ -9,7 +9,7 @@ Clone from GIT and then use Gradle:
 
 # How to use
 
-Here is simple example:
+Here is a simple example:
 
 public interface EventHandler<T> {
     void handle(T event);
@@ -54,7 +54,7 @@ public interface EventHandler<T> {
         }
     }
 
-<strong>and I have output:</strong>
+<strong>and I get the following output:</strong>
 
 20:17:33.646 [main] INFO  i.s.s.eventbus.AlertEventHandler - GOT EVENT: Hello Guava EventBus
 
