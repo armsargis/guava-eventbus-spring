@@ -37,6 +37,11 @@ public interface EventHandler<T> {
 
         <eventbus:handler-scan base-package="info.sargis.spring.eventbus" eventbus-ref="eventBus">
             <eventbus:include type="assignable" expression="info.sargis.spring.eventbus.EventHandler"/>
+            <!-- We can use other filters as well
+            <eventbus:include type="annotation" expression="..."/>
+            <eventbus:include type="regex" expression="..."/>
+            <eventbus:include type="custom" expression="..."/>
+            -->
         </eventbus:handler-scan>
 
         <bean id="eventBus" class="com.google.common.eventbus.EventBus"/>

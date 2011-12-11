@@ -16,6 +16,9 @@
 
 package info.sargis.eventbus.config;
 
+import com.google.common.eventbus.Subscribe;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -37,6 +40,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -53,6 +57,8 @@ public class EventBusHandlerBeanDefinitionParser extends AbstractSingleBeanDefin
     private static final String FILTER_EXPRESSION_ATTRIBUTE = "expression";
 
     public static final String XSD_ATTR_EVENTBUS = "eventbus-ref";
+
+    private final Log logger = LogFactory.getLog(getClass());
 
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
@@ -75,6 +81,7 @@ public class EventBusHandlerBeanDefinitionParser extends AbstractSingleBeanDefin
     }
 
     protected Set<RuntimeBeanReference> getHandlers(Element element, ParserContext parserContext) {
+
         String[] basePackages = StringUtils.tokenizeToStringArray(
                 element.getAttribute(BASE_PACKAGE_ATTRIBUTE), ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS
         );
@@ -85,11 +92,35 @@ public class EventBusHandlerBeanDefinitionParser extends AbstractSingleBeanDefin
         for (String basePackage : basePackages) {
             Set<BeanDefinition> components = scanner.findCandidateComponents(basePackage);
             for (BeanDefinition component : components) {
-                candidates.add(defineRuntimeBeanReference(parserContext, component));
+                if (isEventBusHandlerCandidate(component, parserContext)) {
+                    candidates.add(defineRuntimeBeanReference(parserContext, component));
+                } else {
+                    logger.warn(String.format(
+                            "Found EventBus handler candidate: %s, but without @Subscribe annotation on any public method", component
+                    ));
+                }
             }
         }
 
         return candidates;
+    }
+
+    private boolean isEventBusHandlerCandidate(BeanDefinition component, ParserContext parserContext) {
+        try {
+            String beanClassName = component.getBeanClassName();
+            Class<?> beanClass = Class.forName(beanClassName);
+
+            for (Method method : beanClass.getMethods()) {
+                Subscribe annotation = method.getAnnotation(Subscribe.class);
+                if (annotation != null) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            logger.error("", e);
+        }
+
+        return false;
     }
 
     private String getEventBusRefName(Element element) {
